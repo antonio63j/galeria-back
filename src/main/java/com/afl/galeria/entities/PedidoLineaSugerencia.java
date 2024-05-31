@@ -52,7 +52,7 @@ public class PedidoLineaSugerencia{
     
 	@Override
 	public String toString() {
-		return "PedidoLineaSugerencia [id=" + id + ", cantidad=" + cantidad + ",precioInicio=" + precioInicio + ",sugerencia=" + sugerencia + "]";
+		return "PedidoLineaSugerencia [id=" + id + ", cantidad=" + cantidad + ",precioInicio=" + precioInicio + ",sugerencia=" + sugerencia + "]\n";
 	}
     
     

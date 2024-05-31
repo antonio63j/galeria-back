@@ -26,7 +26,7 @@ INSERT INTO tiposugerencia ( img_file_name, nombre, label, descripcion) VALUES (
 INSERT INTO tiposugerencia ( img_file_name, nombre, label, descripcion) VALUES ('slider3.jpg', 'Pescados y mariscos', 'Pescados y mariscos', 'Legunbres nacionales')
 INSERT INTO tiposugerencia ( img_file_name, nombre, label, descripcion) VALUES ('slider3.jpg', 'Postres', 'Postres', 'Legunbres nacionales')
 
-INSERT INTO sugerencia ( img_file_name, visible, label, tipo, precio, descripcion, alto, ancho, fondo) VALUES ('slider3.jpg', 'si', 'helado choco', 'Postres', 4, 'descripcion', 20, 20, 2)
+INSERT INTO sugerencia ( img_file_name, visible, label, tipo, precio, estado, descripcion, alto, ancho, fondo) VALUES ('slider3.jpg', 'si', 'helado choco', 'Postres', 4, 0, 'descripcion', 20, 20, 2)
 
 
 --INSERT INTO lote (img_file_name, visible, label, precio, descripcion) VALUES ('slider3.jpg', 'si', 'lote 1', 12, 'descripcion'))

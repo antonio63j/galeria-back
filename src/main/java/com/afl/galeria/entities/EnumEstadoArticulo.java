@@ -1,8 +1,9 @@
 package com.afl.galeria.entities;
 
-public enum EnumEstadoSugerencia {
+public enum EnumEstadoArticulo {
 
   DISPONIBLE,
+  ENCARRITO,
   RESERVADA,
   VENDIDA
 

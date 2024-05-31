@@ -20,6 +20,10 @@ public interface IPedidoService {
 	// para carrito
 	public Pedido save(Pedido pedido);
 	
+	public Pedido addSugerencia(Pedido pedido, Long sugerenciaId) throws Exception;
+	
+	public Pedido addLote(Pedido pedido, Long loteId) throws Exception;
+	
 	public Pedido savePedido (Pedido pedido);
 
 	public void deleteById(Long id);

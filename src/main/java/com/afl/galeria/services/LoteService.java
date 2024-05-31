@@ -1,5 +1,6 @@
 package com.afl.galeria.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.afl.galeria.controllers.LoteController;
 import com.afl.galeria.dao.ILoteDao;
 import com.afl.galeria.dao.ILoteSugerenciaDao;
+import com.afl.galeria.entities.EnumEstadoArticulo;
 import com.afl.galeria.entities.Lote;
 import com.afl.galeria.entities.LoteSugerencia;
 import com.afl.galeria.entities.Sugerencia;
@@ -75,24 +77,23 @@ public class LoteService implements ILoteService {
 
 	}
 	
+	// AFL adaptacion artefluido
+	
 	@Override
 	@Transactional
 	public void deleteLoteSugerenciaById(Long id) {
-		
-        // AFL adaptacion para artefluido
-		
-		// leer LoteSugerencia 
-		// leer sugerencia + desmarcar el lote + actualizar la sugerencia
 		
 		LoteSugerencia loteSugerencia;
 		Sugerencia sugerencia;
 		
 		loteSugerencia = loteSugerenciaDao.findById(id).orElse(null);
+		
 		sugerencia = sugerenciaService.findById(loteSugerencia.getSugerencia().getId());
 		sugerencia.setLoteNombre(null);
-		sugerenciaService.save(sugerencia);
+		sugerencia.setEstado(EnumEstadoArticulo.DISPONIBLE);
+		sugerencia.setFechaCambioEstado(LocalDateTime.now());
 		
-		//
+		sugerenciaService.save(sugerencia);
 		
 		loteSugerenciaDao.deleteById(id);
 

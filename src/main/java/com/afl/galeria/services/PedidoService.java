@@ -18,10 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.afl.galeria.controllers.LoteController;
+import com.afl.galeria.dao.ILoteDao;
 import com.afl.galeria.dao.IPedidoDao;
 import com.afl.galeria.dao.IPedidoLineaLoteDao;
 import com.afl.galeria.dao.IPedidoLineaSugerenciaDao;
+import com.afl.galeria.dao.ISugerenciaDao;
 import com.afl.galeria.entities.EnumEstadoPedido;
+import com.afl.galeria.entities.EnumEstadoArticulo;
+import com.afl.galeria.entities.Lote;
 import com.afl.galeria.entities.Pedido;
 import com.afl.galeria.entities.PedidoLineaLote;
 import com.afl.galeria.entities.PedidoLineaSugerencia;
@@ -40,6 +44,14 @@ public class PedidoService implements IPedidoService {
 
 	@Autowired
 	IPedidoLineaLoteDao pedidoLineaLoteDao;
+	
+	// AFL adaptacion artefluido
+	@Autowired
+	private ISugerenciaDao sugerenciaDao;
+	
+	@Autowired
+	private ILoteDao loteDao;
+	//
 	
 	@Autowired
 	EntityManager em;
@@ -84,6 +96,79 @@ public class PedidoService implements IPedidoService {
 		return pedidoNew3;
 	}
 
+	// AFL adaptacion artefluido
+	@Override
+	@Transactional
+	public Pedido addSugerencia(Pedido pedido, Long sugerenciaId) throws Exception {
+
+        // leer sugerencia y marcarla como reservada
+
+
+		String loteNombre = null;
+
+		Sugerencia sugerencia = sugerenciaDao.findById(sugerenciaId).orElse(null);
+		
+		loteNombre = sugerencia.getLoteNombre();
+				
+		if (loteNombre != null) {
+			throw new Exception("La obra está incluida en un lote");
+		}		
+				
+		if (EnumEstadoArticulo.DISPONIBLE == sugerencia.getEstado()) {
+			
+		} else {
+			throw new Exception("La obra ya está en proceso de adquisición, ya no está disponible");
+		}
+
+		sugerencia.setEstado(EnumEstadoArticulo.ENCARRITO);
+        sugerencia.setFechaCambioEstado(LocalDateTime.now());
+		
+		Set<Pedido> pedidos;
+		Pedido pedido2;
+
+		pedidos = findByUsuarioEstadoCreacion(pedido.getUsuario(), EnumEstadoPedido.CREACION);
+		if (pedidos.isEmpty() || pedidos == null) {
+		} else {
+			pedido2 = pedidos.iterator().next();
+			pedido.setId(pedido2.getId());
+		}
+
+		Pedido pedidoNew3 = pedidoDao.saveAndFlush(pedido);
+		return pedidoNew3;
+	}
+
+	
+	// AFL adaptacion artefluido
+	@Override
+	@Transactional
+	public Pedido addLote(Pedido pedido, Long loteId) throws Exception {
+
+		Lote lote = loteDao.findById(loteId).orElse(null);
+				
+		if (EnumEstadoArticulo.DISPONIBLE == lote.getEstado()) {
+			lote.setEstado(EnumEstadoArticulo.ENCARRITO);
+	        lote.setFechaCambioEstado(LocalDateTime.now());
+		} else {
+			throw new Exception("El lote ya está en proceso de adquisición, ya no está disponible");
+		}
+
+		Set<Pedido> pedidos;
+		Pedido pedido2;
+
+		pedidos = findByUsuarioEstadoCreacion(pedido.getUsuario(), EnumEstadoPedido.CREACION);
+		if (pedidos.isEmpty() || pedidos == null) {
+		} else {
+			pedido2 = pedidos.iterator().next();
+			pedido.setId(pedido2.getId());
+		}
+
+		Pedido pedidoNew3 = pedidoDao.saveAndFlush(pedido);
+
+		return pedidoNew3;
+	}
+
+	
+	
 	@Override
 	@Transactional
 	public Pedido savePedido(Pedido pedido) {

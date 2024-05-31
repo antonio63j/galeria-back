@@ -59,7 +59,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.afl.galeria.entities.EnumEstadoSugerencia;
+import com.afl.galeria.entities.EnumEstadoArticulo;
 import com.afl.galeria.entities.Lote;
 import com.afl.galeria.entities.Sugerencia;
 import com.afl.galeria.entities.Tiposugerencia;
@@ -170,7 +170,7 @@ public class SugerenciaController {
 
 		try {
 			sugerencia.setImgFileName("no-photo.png");
-            sugerencia.setEstado(EnumEstadoSugerencia.DISPONIBLE);
+            sugerencia.setEstado(EnumEstadoArticulo.DISPONIBLE);
             sugerencia.setFechaCambioEstado(LocalDateTime.now());
             sugerencia.setLoteNombre(null);
 			
@@ -245,8 +245,8 @@ public class SugerenciaController {
             sugerenciaActual.setAncho(sugerencia.getAncho());
             sugerenciaActual.setFondo(sugerencia.getFondo());
             sugerenciaActual.setVisible(sugerencia.getVisible());
-            sugerenciaActual.setEstado(EnumEstadoSugerencia.DISPONIBLE);
-            sugerenciaActual.setFechaCambioEstado(LocalDateTime.now());
+            //sugerenciaActual.setEstado(EnumEstadoArticulo.DISPONIBLE);
+            //sugerenciaActual.setFechaCambioEstado(LocalDateTime.now());
             
 			sugerenciaUpdated = sugerenciaService.save(sugerenciaActual);
 

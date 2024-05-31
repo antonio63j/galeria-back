@@ -16,4 +16,6 @@ public interface ILoteDao extends JpaRepository<Lote, Long> {
   
 	public Set<Lote> findByVisibleIsOrderByLabel(boolean b);
 	
+
+	
 }

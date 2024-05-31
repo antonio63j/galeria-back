@@ -92,8 +92,11 @@ public class PedidoController {
 		response.sendError(HttpStatus.NOT_IMPLEMENTED.value(), exception.getMessage());
 	}
 
-	@PostMapping("/carrito/save")
-	public ResponseEntity<?> saveCarrito(@Valid @RequestBody Pedido pedido, BindingResult result) {
+	// AFL adaptacion artefluido, desde aqui solo se añade una sugerencia al carrito
+	@PostMapping("/carrito/save/sugerencia")
+	public ResponseEntity<?> saveCarritoLoteSugerencia(@Valid @RequestBody Pedido pedido, 
+			@RequestParam(value = "sugerenciaId", required = true) Long sugerenciaId,
+			BindingResult result) {
 		Pedido pedidoNew = null;
 
 		Map<String, Object> response = new HashMap<>();
@@ -110,9 +113,21 @@ public class PedidoController {
 
 			log.debug("pedido:");
 			log.debug(pedido.toString());
-
-			pedidoNew = pedidoService.save(pedido);
-
+            
+			try {
+			  pedidoNew = pedidoService.addSugerencia(pedido, sugerenciaId);
+			}
+				
+			catch (Exception e ) {
+				
+				response.put("mensaje", e.getMessage());
+				response.put("error", e.getMessage());
+				log.error(response.toString());
+				
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+				
+			}
+						
 			log.debug("pedidoNew:");
 			log.debug(pedidoNew.toString());
 
@@ -126,6 +141,95 @@ public class PedidoController {
 		response.put("data", pedidoNew);
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
+	
+	// AFL adaptacion artefluido, desde aqui solo se añade una sugerencia al carrito
+	@PostMapping("/carrito/save/lote")
+	public ResponseEntity<?> saveCarritoLote(@Valid @RequestBody Pedido pedido, 
+			@RequestParam(value = "loteId", required = true) Long loteId,
+			BindingResult result) {
+		Pedido pedidoNew = null;
+
+		Map<String, Object> response = new HashMap<>();
+
+		if (result.hasErrors()) {
+			List<String> errors = result.getFieldErrors().stream()
+					.map(fielderror -> "El campo '" + fielderror.getField() + "' " + fielderror.getDefaultMessage())
+					.collect(Collectors.toList());
+			response.put("errors", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		try {
+
+			log.debug("pedido:");
+			log.debug(pedido.toString());
+            
+			try {
+			  pedidoNew = pedidoService.addLote(pedido, loteId);
+			}
+				
+			catch (Exception e ) {
+				
+				response.put("mensaje", e.getMessage());
+				response.put("error", e.getMessage());
+				
+				log.error(response.toString());
+				
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+				
+			}
+			
+			
+			log.debug("pedidoNew:");
+			log.debug(pedidoNew.toString());
+
+		} catch (DataAccessException e) {
+			response.put("mensaje", "error en el acceso a la base de datos, no ha sido posible persistir el objeto");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			log.error(response.toString());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		response.put("mensaje", "creado pedido");
+		response.put("data", pedidoNew);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+	}
+	
+//	AFL adapatacion se ha dividido en /carrito/save/lote y ../sugerencia
+//	@PostMapping("/carrito/save")
+//	public ResponseEntity<?> saveCarrito(@Valid @RequestBody Pedido pedido, BindingResult result) {
+//		Pedido pedidoNew = null;
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		if (result.hasErrors()) {
+//			List<String> errors = result.getFieldErrors().stream()
+//					.map(fielderror -> "El campo '" + fielderror.getField() + "' " + fielderror.getDefaultMessage())
+//					.collect(Collectors.toList());
+//			response.put("errors", errors);
+//			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+//		}
+//
+//		try {
+//
+//			log.debug("pedido:");
+//			log.debug(pedido.toString());
+//
+//			pedidoNew = pedidoService.save(pedido);
+//
+//			log.debug("pedidoNew:");
+//			log.debug(pedidoNew.toString());
+//
+//		} catch (DataAccessException e) {
+//			response.put("mensaje", "error en el acceso a la base de datos, no ha sido posible persistir el objeto");
+//			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+//			log.error(response.toString());
+//			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		response.put("mensaje", "creado pedido");
+//		response.put("data", pedidoNew);
+//		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+//	}
+//	
 
 	@PostMapping("/carrito/confirmacion")
 	public ResponseEntity<?> confirmacionCarrito(

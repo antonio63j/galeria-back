@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,6 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.afl.galeria.entities.EnumComponenteLote;
+import com.afl.galeria.entities.EnumEstadoArticulo;
 import com.afl.galeria.entities.Lote;
 import com.afl.galeria.entities.LoteSugerencia;
 import com.afl.galeria.entities.Sugerencia;
@@ -100,6 +103,9 @@ public class LoteController {
 
 		try {
 			lote.setImgFileName("no-photo.png");
+            lote.setEstado(EnumEstadoArticulo.DISPONIBLE);
+            lote.setFechaCambioEstado(LocalDateTime.now());
+
 			loteNew = loteService.save(lote);
 		} catch (DataAccessException e) {
 			response.put("mensaje", "error en el acceso a la base de datos, no ha sido posible persistir el objeto");
@@ -111,8 +117,9 @@ public class LoteController {
 		response.put("data", loteNew);
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
-
-//	@Secured({"ROLE_ADMIN"})
+	
+	// AFL adaptación a artefluido
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/lotesugerencia/create")
 	public ResponseEntity<?> createLoteSugerencia(@RequestBody Lote loteAct,
 			@RequestParam(value = "sugerenciaId", required = true) Long sugerenciaId,
@@ -133,17 +140,32 @@ public class LoteController {
 			log.debug("autentication.getName():");
 			log.debug(authentication.getName());
 			
+			
 							     
 	        Sugerencia sugerencia = sugerenciaService.findById(sugerenciaId);
-			LoteSugerencia loteSugerencia = new LoteSugerencia(loteAct, sugerencia, componenteLote);
-			loteService.saveLoteSugerencia(loteSugerencia);
-			
-			
-			loteFinal = loteService.findById(loteAct.getId());
-			response.put("mensaje", "creada nueva sugerencia al Lote");
-			response.put("data", loteFinal);
+	        
+	        if (sugerencia.getEstado() == EnumEstadoArticulo.DISPONIBLE) {
+				LoteSugerencia loteSugerencia = new LoteSugerencia(loteAct, sugerencia, componenteLote);
+				loteService.saveLoteSugerencia(loteSugerencia);
+				
+				
+				loteFinal = loteService.findById(loteAct.getId());
+				response.put("mensaje", "añadida sugerencia al Lote");
+				response.put("data", loteFinal);
 
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+			    return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+			
+	        } else {
+	        	
+				response.put("mensaje", "La obra está en proceso de adquisición");
+				response.put("error", "La obra está en proceso de adquisición");
+				log.error(response.toString());
+				
+				// response.put("mensaje", "La obra está en proceso de adquisición");
+				// response.put("data", loteAct);
+
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);	        	
+	        }
 
 		} catch (DataAccessException e) {
 
@@ -206,7 +228,8 @@ public class LoteController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
-	// @Secured({"ROLE_ADMIN"})
+	// AFL adaptacion artefluido
+	@Secured({"ROLE_ADMIN"})
 	@DeleteMapping("/lotesugerencia/{id}")
 	public ResponseEntity<?> deleteLoteSugerencia(@PathVariable Long id) {
 		Map<String, Object> response = new HashMap<>();

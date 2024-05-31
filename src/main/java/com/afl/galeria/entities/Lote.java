@@ -1,6 +1,8 @@
 package com.afl.galeria.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,6 +52,11 @@ public class Lote implements Serializable {
 	@NotNull
 	@Column(name = "precio")
     private Double precio;
+	
+	private EnumEstadoArticulo estado;
+	
+	private LocalDateTime fechaCambioEstado;
+
 	    
     // @JsonIgnoreProperties(value={"lote", "hibernateLazyInitializer", "handler"}, allowSetters=true)
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

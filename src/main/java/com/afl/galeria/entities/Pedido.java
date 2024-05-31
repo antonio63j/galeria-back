@@ -110,7 +110,7 @@ public class Pedido implements Serializable {
 	public String toString() {
 		return "Pedido [id=" + id + ", usuario=" + usuario + ", estadoPedido=" + estadoPedido + ", fechaRegistro="
 				+ fechaRegistro + ", fechaEntrega=" + fechaEntrega + ", nota=" + nota
-				+ ", pedidoLineaSugerencias=" + pedidoLineaSugerencias.toString() + ", pedidoLineaLotes=" + pedidoLineaLotes.toString() + "]";
+				+ "\n, pedidoLineaSugerencias=\n" + pedidoLineaSugerencias.toString() + ",\n pedidoLineaLotes=\n" + pedidoLineaLotes.toString() + "]\n";
 	}
 	
 //    @JsonGetter("usuario")

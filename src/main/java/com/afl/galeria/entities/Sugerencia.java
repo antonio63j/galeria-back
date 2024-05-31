@@ -49,8 +49,10 @@ public class Sugerencia implements Serializable {
 	private double alto;
 	private double ancho;
 	private double fondo;
-	private EnumEstadoSugerencia estado;
+	private EnumEstadoArticulo estado;
 	private LocalDateTime fechaCambioEstado;
 	private String loteNombre;
+	private String autor;
+	private Long anioCreacion;
 
 }
